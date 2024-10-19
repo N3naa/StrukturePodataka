@@ -145,7 +145,7 @@ position find_person(char* lname,position person)
     return person;
 }
 
-position find_before(char* lname,position person)
+/*position find_before(char* lname,position person)
 {
     while(person->next != NULL && (strcmp(person->next->lname,lname) != 0))
     {
@@ -154,13 +154,18 @@ position find_before(char* lname,position person)
 
     if(person->next != NULL) return person;
     else return NULL;
-}
+}*/
 
 int delete_person(char* lname,position person)
 {
     position temp;
 
-    person = find_before(lname,person);
+    //person = find_before(lname,person);
+
+    while(person->next != NULL && (strcmp(person->next->lname,lname)))
+    {
+        person = person->next;
+    }
 
     if(person == NULL)
     {

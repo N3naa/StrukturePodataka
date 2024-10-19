@@ -74,10 +74,9 @@ int main()
     puts("Enter the last name you want to search: ");
     scanf("%[^\n]", lname);
     fflush(stdin);
-    position p = find_person(lname,&head);
-    if(p != NULL) printf("The person %s %s has been found!\n", p->fname, p->lname);
+
+    if(find_person(lname,&head) != NULL) printf("The person has been found!\n");
     else printf("The person with the last name: %s has not been found!\n", lname);
-    free(p);
 
     puts("Enter the last name of a person that you would like to delete: \n");
     scanf("%[^\n]", lname);
@@ -88,7 +87,20 @@ int main()
     print_list(head.next);
 
     char search[NAME_SIZE];
-    puts("Enter the last name of a person that you want to add after: \n");
+    puts("Enter the last name of a person that you want to add before it: \n");
+    scanf("%[^\n]", search);
+    fflush(stdin);
+    printf("Enter first and last name of the new person: \n");
+    scanf("%s %s", fname, lname);
+    printf("Enter birth year: \n");
+    scanf("%d", &birth_year);
+    fflush(stdin);
+
+    append_before(fname,lname,birth_year,&head,search);
+
+    print_list(&head);
+    
+    puts("Enter the last name of a person that you want to add after it: \n");
     scanf("%[^\n]", search);
     fflush(stdin);
     printf("Enter first and last name of the new person: \n");
@@ -183,10 +195,12 @@ position find_person(char* lname,position person)
         person = person->next;
     }
 
+    printf("%s %s!", person->fname, person->lname);
+
     return person;
 }
 
-/*position find_before(char* lname,position person)
+position find_before(char* lname,position person)
 {
     while(person->next != NULL && (strcmp(person->next->lname,lname) != 0))
     {
@@ -195,7 +209,7 @@ position find_person(char* lname,position person)
 
     if(person->next != NULL) return person;
     else return NULL;
-}*/
+}
 
 int delete_person(char* lname,position person)
 {
@@ -203,7 +217,7 @@ int delete_person(char* lname,position person)
 
     //person = find_before(lname,person);
 
-    while(person != NULL && (strcmp(person->lname,lname)))
+    while(person->next != NULL && (strcmp(person->next->lname,lname)))
     {
         person = person->next;
     }
@@ -231,7 +245,8 @@ int append_before(char* fname,char* lname,int birth_year,position person,char* s
         return EXIT_FAILURE;
     }
 
-    person = find_person(search,person);
+    person = find_person(search,person->next);
+
 
     if(person == NULL)
     {
@@ -259,7 +274,8 @@ int append_after(char* fname,char* lname,int birth_year, position person,char* s
         return EXIT_FAILURE;
     }
 
-    person = find_before(search,person->next);
+    person = find_before(search,person);
+
 
     if(person == NULL)
     {
