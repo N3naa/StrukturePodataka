@@ -250,7 +250,7 @@ int append_before(char* fname,char* lname,int birth_year,position person,char* s
 
     //person = find_person(search,person->next);
 
-    while(person->next != NULL && (strcmp(person->next->lname,search)==0))
+    while(person->next != NULL && (strcmp(person->next->lname,search)!=0))
     {
         person = person->next;
     }
@@ -283,7 +283,7 @@ int append_after(char* fname,char* lname,int birth_year, position person,char* s
 
     //person = find_before(search,person);
 
-    while(person != NULL && (strcmp(person->lname,search)==0))
+    while(person != NULL && (strcmp(person->lname,search)!=0))
     {
         person = person->next;
     }
