@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define ERROR_OF -1
 #define NAME_SIZE 256
 
 typedef struct _person* position;
@@ -114,12 +113,16 @@ int main()
 
     sort_people(&head);
 
+    puts("Sorted list: \n");
+    print_list(&head);
+
     puts("Writing sorted list of people to the file: people.txt ...\n");
     write_file(head.next);
 
     puts("Reading from a file...\n");
     _person head_file;
     position current = &head_file;
+    head_file.next = NULL;
     read_file(&head_file);
     puts("Contents of the file: \n");
     while(current != NULL)
@@ -245,10 +248,14 @@ int append_before(char* fname,char* lname,int birth_year,position person,char* s
         return EXIT_FAILURE;
     }
 
-    person = find_person(search,person->next);
+    //person = find_person(search,person->next);
 
+    while(person->next != NULL && (strcmp(person->next->lname,search)==0))
+    {
+        person = person->next;
+    }
 
-    if(person == NULL)
+    if(person->next == NULL)
     {
        printf("The given last name is not in the list!\n"); 
         return EXIT_FAILURE;
@@ -258,7 +265,7 @@ int append_before(char* fname,char* lname,int birth_year,position person,char* s
     strcpy(new_person->lname, lname);
     new_person->birth_year = birth_year;
 
-    new_person = person->next;
+    new_person->next = person->next;
     person->next = new_person;
 
     return EXIT_SUCCESS;
@@ -274,8 +281,12 @@ int append_after(char* fname,char* lname,int birth_year, position person,char* s
         return EXIT_FAILURE;
     }
 
-    person = find_before(search,person);
+    //person = find_before(search,person);
 
+    while(person != NULL && (strcmp(person->lname,search)==0))
+    {
+        person = person->next;
+    }
 
     if(person == NULL)
     {
@@ -287,7 +298,7 @@ int append_after(char* fname,char* lname,int birth_year, position person,char* s
     strcpy(new_person->lname, lname);
     new_person->birth_year = birth_year;
 
-    new_person = person->next;
+    new_person->next = person->next;
     person->next = new_person; 
 
     return EXIT_SUCCESS;
@@ -323,7 +334,7 @@ int write_file(position person)
     if(fp == NULL)
     {
         printf("Error opening file!\n");
-        return ERROR_OF;
+        return EXIT_FAILURE;
     }
 
     fputs("FIRST NAME:\tLAST NAME:\tBIRTH_YEAR\n",fp);
@@ -341,7 +352,7 @@ int write_file(position person)
 
 int read_file(position person)
 {
-    FILE* fp = fopen("people.txt", "w");
+    FILE* fp = fopen("people.txt", "r");
     char fname[NAME_SIZE];
     char lname[NAME_SIZE];
     int birth_day;
@@ -349,7 +360,7 @@ int read_file(position person)
     if(fp == NULL)
     {
         printf("Error opening file!\n");
-        return ERROR_OF;
+        return EXIT_FAILURE;
     }
 
     while(!feof(fp))
