@@ -113,9 +113,6 @@ int main()
 
     sort_people(&head);
 
-    puts("Sorted list: \n");
-    print_list(&head);
-
     puts("Writing sorted list of people to the file: people.txt ...\n");
     write_file(head.next);
 
@@ -127,13 +124,13 @@ int main()
     puts("Contents of the file: \n");
     while(current != NULL)
     {
-        printf("%s %s - %d", current->fname, current->lname, current->birth_year);
+        printf("%s %s - %d\n", current->fname, current->lname, current->birth_year);
         current = current->next;
     }
     free(current);
 
-    delete_all(&head);
-    delete_all(&head_file);
+    delete_all(head.next);
+    delete_all(head_file.next);
 
     return 0;
 }
@@ -337,8 +334,6 @@ int write_file(position person)
         return EXIT_FAILURE;
     }
 
-    fputs("FIRST NAME:\tLAST NAME:\tBIRTH_YEAR\n",fp);
-
     while(person != NULL)
     {
         fprintf(fp,"%s\t%s\t%d\n", person->fname, person->lname, person->birth_year);
@@ -365,8 +360,8 @@ int read_file(position person)
 
     while(!feof(fp))
     {
-        fscanf(fp,"%s\t%s\t%d", fname, lname, &birth_day);
-        add(fname,lname,birth_day,person);
+        fscanf(fp,"%s   %s  %d", fname, lname, &birth_day);
+        add_end(fname,lname,birth_day,person);
     }
 
     fclose(fp);
@@ -378,7 +373,7 @@ int delete_all(position person)
 {
     position temp;
 
-    puts("Deleting the linked list...\n");
+    puts("\nDeleting the linked list...\n");
     
     while(person != NULL)
     {
