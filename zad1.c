@@ -18,7 +18,7 @@ typedef struct student
 }_student;
 
 int count_rows(char *);
-void fill_array(_student *,int ,char * );
+int fill_array(_student *,int ,char * );
 
 int main()
 {
@@ -77,7 +77,7 @@ int count_rows(char *filename)
     return i;
 }
 
-void fill_array(_student *ps,int n,char *filename )
+int fill_array(_student *ps,int n,char *filename )
 {
     FILE *fp = fopen(filename,"r");
     const float max_score = 50;
@@ -86,7 +86,7 @@ void fill_array(_student *ps,int n,char *filename )
     {
         perror("Error opening file: ");
         errno = 0;
-        return ;
+        return EXIT_FAILURE;
     }
 
     for(int i = 0; i < n; i++)
@@ -97,5 +97,5 @@ void fill_array(_student *ps,int n,char *filename )
 
     fclose(fp);
 
-    return ;
+    return EXIT_SUCCESS;
 }

@@ -67,8 +67,7 @@ int main()
     puts("Enter the last name you want to search: ");
     scanf("%[^\n]", lname);
     fflush(stdin);
-    position p = find_person(lname,&head);
-    if(p != NULL) printf("The person %s %s has been found!\n", p->fname, p->lname);
+    if(find_person(lname,&head) != NULL) printf("The person has been found!\n");
     else printf("The person with the last name: %s has not been found!\n", lname);
 
     puts("Enter the last name of a person that you would like to delete: \n");
@@ -141,6 +140,8 @@ position find_person(char* lname,position person)
     {
         person = person->next;
     }
+
+    printf("%s %s!\n", person->fname, person->lname);
 
     return person;
 }

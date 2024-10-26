@@ -85,9 +85,9 @@ int main()
 
     print_list(head.next);
 
-    char search[NAME_SIZE];
+    char search_before[NAME_SIZE];
     puts("Enter the last name of a person that you want to add before it: \n");
-    scanf("%[^\n]", search);
+    scanf("%[^\n]", search_before);
     fflush(stdin);
     printf("Enter first and last name of the new person: \n");
     scanf("%s %s", fname, lname);
@@ -95,19 +95,20 @@ int main()
     scanf("%d", &birth_year);
     fflush(stdin);
 
-    append_before(fname,lname,birth_year,&head,search);
+    append_before(fname,lname,birth_year,&head,search_before);
 
     print_list(&head);
     
+    char search_after[NAME_SIZE];
     puts("Enter the last name of a person that you want to add after it: \n");
-    scanf("%[^\n]", search);
+    scanf("%[^\n]", search_after);
     fflush(stdin);
     printf("Enter first and last name of the new person: \n");
     scanf("%s %s", fname, lname);
     printf("Enter birth year: \n");
     scanf("%d", &birth_year);
 
-    append_after(fname,lname,birth_year,&head,search);
+    append_after(fname,lname,birth_year,&head,search_after);
 
     print_list(head.next);
 
@@ -116,20 +117,20 @@ int main()
     puts("Writing sorted list of people to the file: people.txt ...\n");
     write_file(head.next);
 
+    delete_all(head.next);
+
     puts("Reading from a file...\n");
     _person head_file;
     position current = &head_file;
     head_file.next = NULL;
     read_file(&head_file);
     puts("Contents of the file: \n");
-    while(current != NULL)
+    while(current->next != NULL)
     {
         printf("%s %s - %d\n", current->fname, current->lname, current->birth_year);
         current = current->next;
     }
-    free(current);
 
-    delete_all(head.next);
     delete_all(head_file.next);
 
     return 0;
@@ -163,6 +164,7 @@ int add(char* fname,char* lname,int birth_year,position person)
 
     return EXIT_SUCCESS;
 }
+
 int add_end(char* fname,char* lname,int birth_year,position person)
 {
     position new_person = (position)malloc(sizeof(_person));
@@ -222,7 +224,7 @@ int delete_person(char* lname,position person)
         person = person->next;
     }
 
-    if(person == NULL)
+    if(person->next == NULL)
     {
         printf("The given last name is not in the list!\n");
         return EXIT_FAILURE;
@@ -303,24 +305,33 @@ int append_after(char* fname,char* lname,int birth_year, position person,char* s
 
 int sort_people(position person)
 {
-    position current, temp;
-    
-    while(person != NULL)
-    {
-        current = person;
+    //using bubble sort
+    position temp, prev, curr, end;
 
-        while(current->next != NULL)
+    end = NULL;
+
+    while(person->next != end)
+    {
+        prev = person;
+        curr = person->next;
+
+        while(curr->next != end)
         {
-            if(strcmp(current->next->lname,current->lname)<0)
+            if(strcmp(curr->next->lname, curr->lname)<0)
             {
-                temp = current;
-                current = current->next;
-                current->next = temp;
+                temp = curr->next;
+                prev->next = temp;
+                curr->next = temp->next;
+                temp->next = curr;
+
+                curr = temp;
             }
-            current = current->next;
+            prev = curr;
+            curr = curr->next;
         }
-        person = person->next;
+        end = curr;
     }
+
     return EXIT_SUCCESS;
 }
 
