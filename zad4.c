@@ -205,7 +205,7 @@ int Sum(Position p1,Position p2,Position S)
             p1 = p1->next;
         }
 
-        else if(p1->exponent < p2->exponent)
+        else
         {
             temp = CreateElement(p2->exponent, p2->coefficient);
             InsertSorted(S,temp);
