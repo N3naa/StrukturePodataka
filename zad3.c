@@ -345,7 +345,7 @@ int write_file(position person)
         return EXIT_FAILURE;
     }
 
-    while(person != NULL)
+    while(person->next != NULL)
     {
         fprintf(fp,"%s\t%s\t%d\n", person->fname, person->lname, person->birth_year);
         person = person->next;
