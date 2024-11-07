@@ -55,11 +55,13 @@ void Print(Position p)
 {
     while(p != NULL)
     {
-        if(p->coefficient > 0) printf("%dx^%d + ", p->coefficient, p->exponent);
-        else printf("\b\b\b %dx^%d + ", p->coefficient, p->exponent);
+        if(p->coefficient > 0) printf("%dx^%d ", p->coefficient, p->exponent);
+        else printf("\b\b%dx^%d ", p->coefficient, p->exponent);
+
+        if(p->next != NULL) printf(" + ");
         p = p->next;
     }
-
+    
     puts(" ");
 }
 
@@ -72,30 +74,33 @@ int InsertSorted(Position head, Position new_element)
         InsertAfter(temp,new_element);
     }
     
-    while(temp->next != NULL && temp->next->exponent > new_element->exponent)
+    else
     {
-        temp = temp->next;
-    }
-
-    if(temp->next == NULL || temp->next->exponent != new_element->exponent)
-    {
-        InsertAfter(temp,new_element);
-    }
-
-    else if(temp->next->exponent == new_element->exponent)
-    {
-        int ResultCoefficient = temp->next->coefficient + new_element->coefficient;
-
-        if(ResultCoefficient == 0)
+        while(temp->next != NULL && temp->next->exponent > new_element->exponent)
         {
-            DeleteAfter(temp);
-            free(new_element);
+            temp = temp->next;
         }
 
-        else
+        if(temp->next == NULL || temp->next->exponent != new_element->exponent)
         {
-            temp->next->coefficient = ResultCoefficient;
-            free(new_element);
+            InsertAfter(temp,new_element);
+        }
+
+        else if(temp->next->exponent == new_element->exponent)
+        {
+            int ResultCoefficient = temp->next->coefficient + new_element->coefficient;
+
+            if(ResultCoefficient == 0)
+            {
+                DeleteAfter(temp);
+                free(new_element);
+            }
+
+            else
+            {
+                temp->next->coefficient = ResultCoefficient;
+                free(new_element);
+            }
         }
     }
 
@@ -168,7 +173,7 @@ int DeleteAfter(Position p)
 
     if(p->next == NULL)
     {
-        perror("Freeing NULL pointer!!!");
+        perror("Freeing NULL pointer!");
         return EXIT_FAILURE;
     }
 
@@ -195,15 +200,15 @@ int Sum(Position p1,Position p2,Position S)
 
         else if(p1->exponent > p2->exponent)
         {
-            temp = p1;
-            InsertSorted(S,p1);
+            temp = CreateElement(p1->exponent, p1->coefficient);
+            InsertSorted(S,temp);
             p1 = p1->next;
         }
 
         else if(p1->exponent < p2->exponent)
         {
-            temp = p2;
-            InsertSorted(S,p2);
+            temp = CreateElement(p2->exponent, p2->coefficient);
+            InsertSorted(S,temp);
             p2 = p2->next;
         }
     }
@@ -221,10 +226,11 @@ int Sum(Position p1,Position p2,Position S)
 
 int Product(Position p1,Position p2,Position P)
 {
-    Position temp;
+    Position temp, head = p2;
 
     while(p1 != NULL)
     {
+        p2 = head;
         while(p2 != NULL)
         {
             temp = CreateElement(p1->exponent + p2->exponent, p1->coefficient * p2->coefficient);
