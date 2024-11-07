@@ -32,20 +32,20 @@ int main()
     char second_file[] = "second_polynomial.txt";
 
     ReadFile(&P1,first_file);
-    printf("First Polynomial: ");
+    printf("First Polynomial:\t\t");
     Print(P1.next);
     ReadFile(&P2,second_file);
-    printf("Second Polynomial: ");
+    printf("Second Polynomial:\t\t");
     Print(P2.next);
 
     struct Element S = { .exponent = 0, .coefficient = 0, .next = NULL};
     Sum(P1.next,P2.next,&S);
-    printf("Sum of Polynomials: ");
+    printf("Sum of Polynomials:\t\t");
     Print(S.next);
 
     struct Element P = { .exponent = 0, .coefficient = 0, .next = NULL};
     Product(P1.next,P2.next,&P);
-    printf("Product of Polynomials: ");
+    printf("Product of Polynomials: \t");
     Print(P.next);
 
     return 0;
@@ -61,7 +61,7 @@ void Print(Position p)
         if(p->next != NULL) printf(" + ");
         p = p->next;
     }
-    
+
     puts(" ");
 }
 
