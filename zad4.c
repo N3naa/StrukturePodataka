@@ -18,10 +18,11 @@ void Print(Position p);
 Position CreateElement(int exponent, int coefficient);
 int ReadFile(Position p,char* file_name);
 int InsertSorted(Position head, Position new_element);
-int InsertAfter(Position p,Position nE);
+int InsertAfter(Position p,Position new_element);
 int DeleteAfter(Position p);
 int Sum(Position p1,Position p2,Position S);
 int Product(Position p1,Position p2,Position P);
+int Delete(Position p);
 
 int main()
 {
@@ -47,6 +48,11 @@ int main()
     Product(P1.next,P2.next,&P);
     printf("Product of Polynomials: \t");
     Print(P.next);
+
+    Delete(&P1);
+    Delete(&P2);
+    Delete(&P);
+    Delete(&S);
 
     return 0;
 }
@@ -239,6 +245,20 @@ int Product(Position p1,Position p2,Position P)
         }
 
         p1 = p1->next;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int Delete(Position p)
+{
+    Position temp;
+
+    while(p->next != NULL)
+    {
+        temp = p->next;
+        p->next = p->next->next;
+        free(temp);
     }
 
     return EXIT_SUCCESS;
