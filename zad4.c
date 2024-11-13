@@ -130,6 +130,7 @@ int ReadFile(Position p,char* file_name)
     int exponent = 0;
 
     fgets(buffer,MAX_LINE,fp);
+    fclose(fp);
     
     while(strlen(p_buffer) > 0)
     {
