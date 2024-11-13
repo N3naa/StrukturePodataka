@@ -1,9 +1,0 @@
-alex	albon	1996
-ferandno	alonso	1981
-valtterri	bottas	1989
-franco	colapinto	2003
-lewis	hamilton	1985
-charles	leclerc	1997
-lando	norris	1999
-oscar	piastri	2001
-carlos	sainz	1994

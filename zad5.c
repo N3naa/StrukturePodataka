@@ -11,7 +11,7 @@ typedef struct StackElement* Position;
 struct StackElement
 {
     double value;
-    Position next;
+    Position prev;
 };
 
 int Push(Position p,double value);
@@ -25,12 +25,12 @@ int Divide(Position p);
 
 int main()
 {
-    struct StackElement Stack = { .value = 0, .next = NULL};
+    struct StackElement Stack = { .value = 0, .prev = NULL};
 
     ReadFile(&Stack);
 
-    printf("Result: %.2lf\n", Stack.next->value);
-    free(Stack.next);
+    printf("Result: %.2lf\n", Stack.prev->value);
+    free(Stack.prev);
 
     return 0;
 }
@@ -47,8 +47,8 @@ int Push(Position p,double value)
 
     q->value = value;
 
-    q->next = p->next;
-    p->next = q;
+    q->prev = p->prev;
+    p->prev = q;
 
     return EXIT_SUCCESS;
 }
@@ -57,14 +57,14 @@ int Pop(Position p)
 {
     Position temp;
 
-    if(p->next == NULL)
+    if(p->prev == NULL)
     {
         perror("Popping from empty stack!");
         return EXIT_FAILURE;
     }
 
-    temp = p->next;
-    p->next = p->next->next;
+    temp = p->prev;
+    p->prev = p->prev->prev;
     free(temp);
 
     return EXIT_SUCCESS;
@@ -87,8 +87,8 @@ int ReadFile(Position p)
     double operand;
 
     fgets(buffer,MAXLINE,fp);
-    printf("Postfix expersion: %s\n", buffer);
     fclose(fp);
+    printf("Postfix expression: %s\n", buffer);
 
     while(strlen(p_buffer) > 0)
     {
@@ -142,7 +142,7 @@ int Operation(Position p,char operator)
 
 int Add(Position p)
 {
-    double value = p->next->value + p->next->next->value;
+    double value = p->prev->value + p->prev->prev->value;
 
     Pop(p);
     Pop(p);
@@ -154,7 +154,7 @@ int Add(Position p)
 
 int Multipy(Position p)
 {
-    double value = p->next->value * p->next->next->value;
+    double value = p->prev->value * p->prev->prev->value;
 
     Pop(p);
     Pop(p);
@@ -166,7 +166,7 @@ int Multipy(Position p)
 
 int Subtract(Position p)
 {
-    double value = p->next->next->value - p->next->value;
+    double value = p->prev->prev->value - p->prev->value;
 
     Pop(p);
     Pop(p);
@@ -178,13 +178,13 @@ int Subtract(Position p)
 
 int Divide(Position p)
 {
-    if(p->next->next->value == 0)
+    if(p->prev->value == 0)
     {
         puts("Dividing by zero!");
         return EXIT_FAILURE;
     }
 
-    double value = p->next->next->value / p->next->value;
+    double value = p->prev->prev->value / p->prev->value;
 
     Pop(p);
     Pop(p);
