@@ -30,6 +30,7 @@ int main()
     ReadFile(&Stack);
 
     printf("Result: %.2lf\n", Stack.next->value);
+    free(Stack.next);
 
     return 0;
 }
