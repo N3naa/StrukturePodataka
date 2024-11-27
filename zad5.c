@@ -16,7 +16,6 @@ struct StackElement
 
 int Push(Position p,double value);
 int Pop(Position p);
-int Operation(Position p,char operator);
 int ReadFile(Position p);
 int Add(Position p);
 int Multipy(Position p);
@@ -107,7 +106,35 @@ int ReadFile(Position p)
         int check_operator = 0;
         while((check_operator = sscanf(p_buffer," %c %n", &operator, &numBytes) == 1) && !isalnum(operator))
         {
-            Operation(p,operator);
+    
+            switch (operator)
+            {
+                case '+':
+
+                    Add(p);
+                    break;
+
+                case '*':
+
+                    Multipy(p);
+                    break;
+
+                case '-':
+
+                    Subtract(p);
+                    break;
+
+                case '/':
+
+                    Divide(p);
+                    break;
+
+                default:
+
+                puts("Invalid operator!");
+                break;
+            } 
+
             p_buffer += numBytes;
         }
 
@@ -116,62 +143,38 @@ int ReadFile(Position p)
     return EXIT_SUCCESS;
 }
 
-int Operation(Position p,char operator)
-{
-    switch (operator)
-    {
-        case '+':
-            Add(p);
-            break;
-        case '*':
-            Multipy(p);
-            break;
-        case '-':
-            Subtract(p);
-            break;
-        case '/':
-            Divide(p);
-            break;
-        default:
-            puts("Invalid operator!");
-            break;
-    }
-
-    return EXIT_SUCCESS;
-}
-
 int Add(Position p)
 {
-    double value = p->prev->value + p->prev->prev->value;
+    double result = p->prev->value + p->prev->prev->value;
 
     Pop(p);
     Pop(p);
 
-    Push(p,value);
+    Push(p,result);
 
     return EXIT_SUCCESS;
 }
 
 int Multipy(Position p)
-{
-    double value = p->prev->value * p->prev->prev->value;
+{   
+    double result = p->prev->value * p->prev->prev->value;
 
     Pop(p);
     Pop(p);
 
-    Push(p,value);
+    Push(p,result);
 
     return EXIT_SUCCESS;
 }
 
 int Subtract(Position p)
 {
-    double value = p->prev->prev->value - p->prev->value;
+    double result = p->prev->prev->value - p->prev->value;
 
     Pop(p);
     Pop(p);
 
-    Push(p,value);
+    Push(p,result);
 
     return EXIT_SUCCESS;
 }
@@ -180,16 +183,16 @@ int Divide(Position p)
 {
     if(p->prev->value == 0)
     {
-        puts("Dividing by zero!");
+        perror("Dividing by zero!");
         return EXIT_FAILURE;
     }
-
-    double value = p->prev->prev->value / p->prev->value;
+    
+    double result = p->prev->prev->value / p->prev->value;
 
     Pop(p);
     Pop(p);
 
-    Push(p,value);
+    Push(p,result);
 
     return EXIT_SUCCESS;
 }
