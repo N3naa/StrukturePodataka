@@ -110,29 +110,20 @@ int ReadFile(Position p)
             switch (operator)
             {
                 case '+':
-
                     Add(p);
                     break;
-
                 case '*':
-
                     Multipy(p);
                     break;
-
                 case '-':
-
                     Subtract(p);
                     break;
-
                 case '/':
-
                     Divide(p);
                     break;
-
                 default:
-
-                puts("Invalid operator!");
-                break;
+                    puts("Invalid operator!");
+                    break;
             } 
 
             p_buffer += numBytes;
