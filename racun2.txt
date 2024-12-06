@@ -1,0 +1,5 @@
+2020-12-3
+hobotnica 1 49.99
+naranca 3 1.50
+banana 1 1.05
+sparoge 5 2.50

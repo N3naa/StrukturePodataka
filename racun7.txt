@@ -1,0 +1,5 @@
+2023-1-1
+patka 1 29.99
+cikla 3 4.50
+losos 4 24.99
+datulje 7 5.99
