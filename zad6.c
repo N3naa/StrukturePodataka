@@ -23,9 +23,7 @@ typedef struct Receipt* Position_Receipt;
 struct Receipt
 {
     char file_receipt[NAME_SIZE];
-    int year;
-    int month;
-    int day;
+    char date[FILE_LINE];
     struct Articale Head;
     Position_Receipt next;
 };
@@ -35,7 +33,8 @@ int InsertSortedReceipt(Position_Receipt head_receipt, Position_Receipt new_rece
 int InsertSortedArticale(Position_Articale head_articale, Position_Articale new_articale);
 int InsertAfterReceipt(Position_Receipt current, Position_Receipt new_receipt);
 int InsertAfterArticale(Position_Articale current, Position_Articale new_articale);
-Position_Receipt CreateReceipt(char* file_name, int year, int month, int day);
+int CompareDates(char* first_date, char* second_date);
+Position_Receipt CreateReceipt(char* file_name, char* date);
 Position_Articale CreateArticale(char* articale_name, int amount, float price);
 int CreateArticaleList(Position_Receipt new_receipt);
 int MergeReceipts(Position_Receipt current, Position_Receipt new_receipt);
@@ -44,10 +43,11 @@ int SearchInArticaleList(Position_Articale head_articale, char* item);
 int SearchItem(Position_Receipt head_receipt, char* item,char* first_date, char* second_date);
 int DeleteReceipt(Position_Receipt head_receipt);
 int DeleteArticaleList(Position_Articale head_articale);
+bool InTimePeriod(char* receipt_date, char* first_date, char* second_date);
 
 int main()
 {
-    struct Receipt Head_Receipt = { .file_receipt = " ", .year = 0, .month = 0, .day = 0, .next = NULL, .Head.articale_name = " ", .Head.amount = 0, .Head.price = 0.0, .Head.next = NULL};
+    struct Receipt Head_Receipt = { .file_receipt = " ", .date = " ", .next = NULL, .Head.articale_name = " ", .Head.amount = 0, .Head.price = 0.0, .Head.next = NULL};
 
     ReadFile(&Head_Receipt);
 
@@ -76,7 +76,7 @@ int main()
 
 int ReadFile(Position_Receipt head_receipt)
 {
-    FILE *fp = fopen("racuni.txt","r");
+    FILE* fp = fopen("racuni.txt", "r");
 
     if(fp == NULL)
     {
@@ -86,10 +86,6 @@ int ReadFile(Position_Receipt head_receipt)
 
     char buffer[FILE_LINE];
     char file_name[NAME_SIZE];
-    int check = 0;
-    int year;
-    int month;
-    int day;
 
     while(!feof(fp))
     {
@@ -100,48 +96,35 @@ int ReadFile(Position_Receipt head_receipt)
         if(fp_receipt == NULL)
         {
             perror("Error opening receipt file!");
-            return EXIT_FAILURE;
-        }
-
-        fgets(buffer,FILE_LINE,fp_receipt);
-        sscanf(buffer,"%d-%d-%d %n", &year, &month, &day, &check);
-
-        if(check == 0)
-        {
-            puts("Invalid date!");
-            fclose(fp_receipt);
             fclose(fp);
             return EXIT_FAILURE;
         }
 
-        Position_Receipt new_receipt = CreateReceipt(file_name,year,month,day);
+        fgets(buffer,FILE_LINE,fp_receipt);
+
+        Position_Receipt new_receipt = CreateReceipt(file_name,buffer);
 
         if(new_receipt != NULL) InsertSortedReceipt(head_receipt,new_receipt);
         fclose(fp_receipt);
-        check = 0;
     }
-
-    fclose(fp);
 
     return EXIT_SUCCESS;
 }
 
-Position_Receipt CreateReceipt(char* file_name, int year, int month, int day)
+Position_Receipt CreateReceipt(char* file_name, char* date)
 {
-    Position_Receipt new_receipt = (Position_Receipt )malloc(sizeof(struct Receipt));
+    Position_Receipt q = (Position_Receipt )malloc(sizeof(struct Receipt));
 
-    if(new_receipt == NULL)
+    if(q == NULL)
     {
         perror("Could not allocate new receipt!");
         return NULL;
     }
 
-    strcpy(new_receipt->file_receipt, file_name);
-    new_receipt->year = year;
-    new_receipt->month = month;
-    new_receipt->day = day;
+    strcpy(q->file_receipt,file_name);
+    strcpy(q->date,date);
 
-    return new_receipt;
+    return q;
 }
 
 int InsertAfterReceipt(Position_Receipt current, Position_Receipt new_receipt)
@@ -161,169 +144,43 @@ int InsertSortedReceipt(Position_Receipt head_receipt, Position_Receipt new_rece
         return EXIT_SUCCESS;
     }
 
-    else if(head_receipt->next != NULL && head_receipt->next->year < new_receipt->year)
-    {
-        InsertAfterReceipt(head_receipt,new_receipt);
-        CreateArticaleList(new_receipt);
-        return EXIT_SUCCESS;
-    }
-
-    else if(head_receipt->next != NULL && head_receipt->next->year == new_receipt->year)
-    {
-        Position_Receipt current = head_receipt;
-        
-        if(current->next->month == new_receipt->month)
-        {
-            if(current->next->day == new_receipt->day)
-            {
-                MergeReceipts(current,new_receipt);
-                DeleteReceipt(new_receipt);
-                return EXIT_SUCCESS;
-            }
-
-            else
-            {
-                while(current->next != NULL && current->next->day > new_receipt->day)
-                {
-                    current = current->next;
-                }
-
-                if(current->next == NULL || (current->next->day != new_receipt->day))
-                {
-                    InsertAfterReceipt(current,new_receipt);
-                    CreateArticaleList(new_receipt);
-                    return EXIT_SUCCESS;
-                }
-
-                else
-                {
-                    MergeReceipts(current,new_receipt);
-                    DeleteReceipt(new_receipt);
-                    return EXIT_SUCCESS;
-                }
-            }
-        }
-
-        else
-        {
-            while(current->next != NULL && current->next->month > new_receipt->month)
-            {
-                current = current->next;
-            }
-
-            if(current->next == NULL || (current->next != NULL && current->next->month != new_receipt->month))
-            {
-                InsertAfterReceipt(current,new_receipt);
-                CreateArticaleList(new_receipt);
-                return EXIT_SUCCESS;
-            }
-
-            else
-            {
-                while(current->next != NULL && current->next->day > new_receipt->day)
-                {
-                    current = current->next;
-                }
-
-                if(current->next == NULL || (current->next->day != new_receipt->day))
-                {
-                    InsertAfterReceipt(current,new_receipt);
-                    CreateArticaleList(new_receipt);
-                    return EXIT_SUCCESS;
-                }
-
-                else
-                {
-                    MergeReceipts(current,new_receipt);
-                    DeleteReceipt(new_receipt);
-                    return EXIT_SUCCESS;
-                }
-            }
-        }
-    }
-
     else
     {
+        if(CompareDates(head_receipt->next->date,new_receipt->date) == -1)
+        {
+            InsertAfterReceipt(head_receipt,new_receipt);
+            CreateArticaleList(new_receipt);
+            return EXIT_SUCCESS;
+        }
+        
         Position_Receipt current = head_receipt;
-        while(current->next != NULL && current->next->year > new_receipt->year)
+        while(current->next != NULL && CompareDates(current->next->date,new_receipt->date) == 1)
         {
             current = current->next;
         }
 
-        if(current->next == NULL || (current->next != NULL && current->next->year != new_receipt->year))
+        if(current->next == NULL)
         {
-            InsertAfterReceipt(current,new_receipt);
+            InsertAfterReceipt(head_receipt,new_receipt);
+            CreateArticaleList(new_receipt);
+            return EXIT_SUCCESS;
+        }
+        
+        else if(current->next != NULL && CompareDates(current->next->date,new_receipt->date) == -1)
+        {
+            InsertAfterReceipt(head_receipt,new_receipt);
             CreateArticaleList(new_receipt);
             return EXIT_SUCCESS;
         }
 
         else
         {
-            while(current->next != NULL && current->next->month > new_receipt->month)
-            {
-                current = current->next;
-            }
-
-            if(current->next == NULL || (current->next != NULL && current->next->month != new_receipt->month))
-            {
-                InsertAfterReceipt(current,new_receipt);
-                CreateArticaleList(new_receipt);
-                return EXIT_SUCCESS;
-            }
-
-            else
-            {
-                while(current->next != NULL && current->next->day > new_receipt->day)
-                {
-                    current = current->next;
-                }
-
-                if(current->next == NULL || (current->next->day != new_receipt->day))
-                {
-                    InsertAfterReceipt(current,new_receipt);
-                    CreateArticaleList(new_receipt);
-                    return EXIT_SUCCESS;
-                }
-
-                else
-                {
-                    MergeReceipts(current,new_receipt);
-                    DeleteReceipt(new_receipt);
-                }
-            }
+            MergeReceipts(current,new_receipt);
+            DeleteReceipt(new_receipt);
         }
     }
 
     return EXIT_SUCCESS;
-}
-
-int MergeReceipts(Position_Receipt current, Position_Receipt new_receipt)
-{
-    Position_Articale temp = &(new_receipt->Head);
-    
-    while(temp->next != NULL)
-    {
-        if(!IsPresent(&(current->Head),temp))
-        {
-            InsertSortedArticale(&(current->Head),temp);
-        }
-
-        temp = temp->next;
-    }
-
-    DeleteArticaleList(&(current->Head));
-
-    return EXIT_SUCCESS;
-}
-
-bool IsPresent(Position_Articale head_articale, Position_Articale articale)
-{
-    while(head_articale->next != NULL)
-    {
-        if(strcmp(head_articale->next->articale_name, articale->articale_name) == 0) return true;
-    }
-
-    return false;
 }
 
 int CreateArticaleList(Position_Receipt new_receipt)
@@ -434,44 +291,104 @@ int InsertAfterArticale(Position_Articale current, Position_Articale new_artical
     return EXIT_SUCCESS;
 }
 
-int SearchItem(Position_Receipt head_receipt, char* item, char* first_date, char* second_date)
+int CompareDates(char* first_date, char* second_date)
 {
-    int first_year, second_year;
-    int first_month, second_month;
-    int first_day, second_day;
-
-    int count = 0;
+    int first_year, first_month, first_day;
+    int second_year, second_month, second_day;
 
     sscanf(first_date,"%d-%d-%d ", &first_year, &first_month, &first_day);
     sscanf(second_date,"%d-%d-%d ", &second_year, &second_month, &second_day);
 
+    if(first_year > second_year)
+    {
+        return 1;
+    }
+
+    else if(first_year < second_year)
+    {
+        return -1;
+    }
+
+    else
+    {
+        if(first_month > second_month)
+        {
+            return 1;
+        }
+
+        else if(first_month < second_month)
+        {
+            return -1;
+        }
+
+        else
+        {
+            if(first_day > second_day)
+            {
+                return 1;
+            }   
+
+            else if(first_day < second_day)
+            {
+                return -1;
+            }
+        }
+    }
+
+    return 0;
+}
+
+int MergeReceipts(Position_Receipt current, Position_Receipt new_receipt)
+{
+    Position_Articale temp = &(new_receipt->Head);
+    
+    while(temp->next != NULL)
+    {
+        if(!IsPresent(&(current->Head),temp))
+        {
+            InsertSortedArticale(&(current->Head),temp);
+        }
+
+        temp = temp->next;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+bool IsPresent(Position_Articale head_articale, Position_Articale articale)
+{
+    Position_Articale temp;
+    
+    while(head_articale->next != NULL)
+    {
+        if(strcmp(head_articale->next->articale_name, articale->articale_name) == 0) 
+        {
+            temp = articale->next;
+            articale->next = articale->next->next;
+            return true;
+        }
+
+        head_articale = head_articale->next;
+    }
+
+    return false;
+}
+
+int SearchItem(Position_Receipt head_receipt, char* item, char* first_date, char* second_date)
+{
+    int amount = 0;
+
     while(head_receipt->next != NULL)
     {
-        if(head_receipt->next->year >= first_year && head_receipt->next->year <= second_year)
+        if(InTimePeriod(head_receipt->next->date,first_date,second_date))
         {
-           if(first_month == 0 && second_month == 0)
-           {
-                count += SearchInArticaleList(&(head_receipt->Head),item);
-           }
-
-           else if(head_receipt->next->month >= first_month && head_receipt->next->month <= second_month && second_month != 0)
-           {
-                if(first_day == 0 && second_day == 0)
-                {
-                    count += SearchInArticaleList(&(head_receipt->Head),item);
-                }
-
-                else if(head_receipt->next->day >= first_day && head_receipt->next->day <= second_day)
-                {
-                    count += SearchInArticaleList(&(head_receipt->Head),item);
-                }
-           }
+            amount += SearchInArticaleList(&(head_receipt->next->Head),item);
         }
 
         head_receipt = head_receipt->next;
     }
 
-    printf("%s ,between the time period %s to %s, was sold %d times.\n", item, first_date, second_date, count);
+    printf("%s ,between the time period %s to %s, was sold %d times.\n", item, first_date, second_date, amount);
 
     //printf("The total is: %.2f", count*price);
 
@@ -523,4 +440,44 @@ int DeleteArticaleList(Position_Articale head_articale)
     }
 
     return EXIT_SUCCESS;
+}
+
+bool InTimePeriod(char* receipt_date, char* first_date, char* second_date)
+{
+    int receipt_year, receipt_month, receipt_day;
+    int first_year, first_month, first_day;
+    int second_year, second_month, second_day;
+
+    sscanf(receipt_date,"%d-%d-%d ", &receipt_year, &receipt_month, &receipt_day);
+    sscanf(first_date,"%d-%d-%d ", &first_year, &first_month, &first_day);
+    sscanf(second_date,"%d-%d-%d ", &second_year, &second_month, &second_day);
+
+    if(receipt_year >= first_year && receipt_year <= second_year)
+    {
+        if(first_month == 0 && second_month == 0)
+        {
+            return true;
+        }
+
+        else
+        {
+            if((receipt_month >= first_month && receipt_year >= first_year) && (receipt_month <= second_month && receipt_year <= second_year))
+            {
+                if(first_day == 0 && second_day == 0)
+                {
+                    return true;
+                }
+
+                else
+                {
+                    if((receipt_month >= first_month && receipt_year >= first_year && receipt_day >= first_day) && (receipt_month <= second_month && receipt_year <= second_year && receipt_day <= second_day))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
 }
