@@ -379,7 +379,7 @@ int SearchItem(Position_Receipt head_receipt, char* item, char* first_date, char
 
     printf("%s ,between the time period %s to %s, was sold %d times.\n", item, first_date, second_date, amount);
 
-    printf("The total is: %.2f", amount*price);
+    printf("The total is: %.2f\n", amount*price);
 
     return EXIT_SUCCESS;
 }
