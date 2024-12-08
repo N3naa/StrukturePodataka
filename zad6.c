@@ -146,35 +146,23 @@ int InsertSortedReceipt(Position_Receipt head_receipt, Position_Receipt new_rece
 
     else
     {
-        if(CompareDates(head_receipt->next->date,new_receipt->date) == -1)
-        {
-            InsertAfterReceipt(head_receipt,new_receipt);
-            CreateArticaleList(new_receipt);
-            return EXIT_SUCCESS;
-        }
-        
         Position_Receipt current = head_receipt;
+
         while(current->next != NULL && CompareDates(current->next->date,new_receipt->date) == 1)
         {
             current = current->next;
         }
 
-        if(current->next == NULL)
+        if(current->next == NULL || CompareDates(current->next->date,new_receipt->date) == -1)
         {
-            InsertAfterReceipt(head_receipt,new_receipt);
-            CreateArticaleList(new_receipt);
-            return EXIT_SUCCESS;
-        }
-        
-        else if(current->next != NULL && CompareDates(current->next->date,new_receipt->date) == -1)
-        {
-            InsertAfterReceipt(head_receipt,new_receipt);
+            InsertAfterReceipt(current,new_receipt);
             CreateArticaleList(new_receipt);
             return EXIT_SUCCESS;
         }
 
         else
         {
+            CreateArticaleList(new_receipt);
             MergeReceipts(current,new_receipt);
             DeleteReceipt(new_receipt);
         }
@@ -340,16 +328,18 @@ int CompareDates(char* first_date, char* second_date)
 
 int MergeReceipts(Position_Receipt current, Position_Receipt new_receipt)
 {
-    Position_Articale temp = &(new_receipt->Head);
-    
-    while(temp->next != NULL)
+    Position_Articale temp, dummy = &(new_receipt->Head);
+
+    while(dummy->next != NULL)
     {
-        if(!IsPresent(&(current->Head),temp))
+        if(!IsPresent(&(current->next->Head),dummy->next))
         {
-            InsertSortedArticale(&(current->Head),temp);
+            temp = CreateArticale(dummy->next->articale_name,dummy->next->amount,dummy->next->price);
+            
+            InsertSortedArticale(&(current->next->Head),temp);
         }
 
-        temp = temp->next;
+        dummy = dummy->next;
     }
 
     return EXIT_SUCCESS;
@@ -357,14 +347,10 @@ int MergeReceipts(Position_Receipt current, Position_Receipt new_receipt)
 
 bool IsPresent(Position_Articale head_articale, Position_Articale articale)
 {
-    Position_Articale temp;
-    
     while(head_articale->next != NULL)
     {
-        if(strcmp(head_articale->next->articale_name, articale->articale_name) == 0) 
+        if(strcmp(head_articale->next->articale_name,articale->articale_name) == 0)
         {
-            temp = articale->next;
-            articale->next = articale->next->next;
             return true;
         }
 
