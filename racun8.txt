@@ -3,3 +3,4 @@ blitva 3 4.99
 naranca 8 1.50
 hobotnica 1 49.99
 kokos 2 7.99
+krumpir 2 1.25

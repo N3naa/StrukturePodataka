@@ -40,6 +40,7 @@ int CreateArticaleList(Position_Receipt new_receipt);
 int MergeReceipts(Position_Receipt current, Position_Receipt new_receipt);
 bool IsPresent(Position_Articale head_articale, Position_Articale articale);
 int SearchInArticaleList(Position_Articale head_articale, char* item);
+float FindPrice(Position_Articale head_articale, char* item);
 int SearchItem(Position_Receipt head_receipt, char* item,char* first_date, char* second_date);
 int DeleteReceipt(Position_Receipt head_receipt);
 int DeleteArticaleList(Position_Articale head_articale);
@@ -363,11 +364,13 @@ bool IsPresent(Position_Articale head_articale, Position_Articale articale)
 int SearchItem(Position_Receipt head_receipt, char* item, char* first_date, char* second_date)
 {
     int amount = 0;
+    float price;
 
     while(head_receipt->next != NULL)
     {
         if(InTimePeriod(head_receipt->next->date,first_date,second_date))
         {
+            if(amount == 0) price = FindPrice(&(head_receipt->next->Head),item);
             amount += SearchInArticaleList(&(head_receipt->next->Head),item);
         }
 
@@ -376,7 +379,7 @@ int SearchItem(Position_Receipt head_receipt, char* item, char* first_date, char
 
     printf("%s ,between the time period %s to %s, was sold %d times.\n", item, first_date, second_date, amount);
 
-    //printf("The total is: %.2f", count*price);
+    printf("The total is: %.2f", amount*price);
 
     return EXIT_SUCCESS;
 }
@@ -397,6 +400,24 @@ int SearchInArticaleList(Position_Articale head_articale, char* item)
     }
 
     return count;
+}
+
+float FindPrice(Position_Articale head_articale, char* item)
+{
+    float price = 0.0;
+
+    while(head_articale->next != NULL)
+    {
+        if(strcmp(head_articale->next->articale_name,item) == 0)
+        {
+            price = head_articale->next->price;
+            break;
+        }
+
+        head_articale = head_articale->next;
+    }
+
+    return price;
 }
 
 int DeleteReceipt(Position_Receipt head_receipt)
@@ -447,7 +468,7 @@ bool InTimePeriod(char* receipt_date, char* first_date, char* second_date)
 
         else
         {
-            if((receipt_month >= first_month && receipt_year >= first_year) && (receipt_month <= second_month && receipt_year <= second_year))
+            if(receipt_month >= first_month && receipt_month <= second_month )
             {
                 if(first_day == 0 && second_day == 0)
                 {
@@ -456,7 +477,7 @@ bool InTimePeriod(char* receipt_date, char* first_date, char* second_date)
 
                 else
                 {
-                    if((receipt_month >= first_month && receipt_year >= first_year && receipt_day >= first_day) && (receipt_month <= second_month && receipt_year <= second_year && receipt_day <= second_day))
+                    if(receipt_day >= first_day && receipt_day <= second_day)
                     {
                         return true;
                     }
