@@ -6,15 +6,15 @@
 #define FILE_LINE 1024
 #define NAME_SIZE 256
 
-struct Articale;
-typedef struct Articale* Position_Articale;
+struct Article;
+typedef struct Article* Position_Article;
 
-struct Articale
+struct Article
 {
-    char articale_name[NAME_SIZE];
+    char article_name[NAME_SIZE];
     int amount;
     float price;
-    Position_Articale next;
+    Position_Article next;
 };
 
 struct Receipt;
@@ -24,43 +24,43 @@ struct Receipt
 {
     char file_receipt[NAME_SIZE];
     char date[FILE_LINE];
-    struct Articale Head;
+    struct Article Head;
     Position_Receipt next;
 };
 
 int ReadFile(Position_Receipt head_receipt);
 int InsertSortedReceipt(Position_Receipt head_receipt, Position_Receipt new_receipt);
-int InsertSortedArticale(Position_Articale head_articale, Position_Articale new_articale);
+int InsertSortedArticle(Position_Article head_article, Position_Article new_article);
 int InsertAfterReceipt(Position_Receipt current, Position_Receipt new_receipt);
-int InsertAfterArticale(Position_Articale current, Position_Articale new_articale);
+int InsertAfterArticle(Position_Article current, Position_Article new_article);
 int CompareDates(char* first_date, char* second_date);
 Position_Receipt CreateReceipt(char* file_name, char* date);
-Position_Articale CreateArticale(char* articale_name, int amount, float price);
-int CreateArticaleList(Position_Receipt new_receipt);
+Position_Article CreateArticle(char* article_name, int amount, float price);
+int CreateArticleList(Position_Receipt new_receipt);
 int MergeReceipts(Position_Receipt current, Position_Receipt new_receipt);
-bool IsPresent(Position_Articale head_articale, Position_Articale articale);
-int SearchInArticaleList(Position_Articale head_articale, char* item);
-float FindPrice(Position_Articale head_articale, char* item);
+bool IsPresent(Position_Article head_article, Position_Article article);
+int SearchInArticleList(Position_Article head_article, char* item);
+float FindPrice(Position_Article head_article, char* item);
 int SearchItem(Position_Receipt head_receipt, char* item,char* first_date, char* second_date);
 int DeleteReceipt(Position_Receipt head_receipt);
-int DeleteArticaleList(Position_Articale head_articale);
+int DeleteArticaleList(Position_Article head_article);
 bool InTimePeriod(char* receipt_date, char* first_date, char* second_date);
 
 int main()
 {
-    struct Receipt Head_Receipt = { .file_receipt = " ", .date = " ", .next = NULL, .Head.articale_name = " ", .Head.amount = 0, .Head.price = 0.0, .Head.next = NULL};
+    struct Receipt Head_Receipt = { .file_receipt = " ", .date = " ", .next = NULL, .Head.article_name = " ", .Head.amount = 0, .Head.price = 0.0, .Head.next = NULL};
 
     ReadFile(&Head_Receipt);
 
     puts("*****************************************************************************************************\n");
-    puts("This program searches the receipts for an articale in a given time period (both provided by the user)\n and outputs the amount of said item sold, along with the total price.\nNote: by setting month and/or day as zero, the program will default to only using the relevent \n data provided!\n");
+    puts("This program searches the receipts for an article in a given time period (both provided by the user)\n and outputs the amount of said item sold, along with the total price.\nNote: by setting month and/or day as zero, the program will default to only using the relevent \n data provided!\n");
     puts("*****************************************************************************************************\n\n");
 
     char item[NAME_SIZE];
     char first_date[FILE_LINE];
     char second_date[FILE_LINE];
 
-    puts("Enter an articale: ");
+    puts("Enter an article: ");
     scanf("%[^\n]", item);
     fflush(stdin);
     puts("Enter time period (format: YYYY-MM-D): ");
@@ -141,7 +141,7 @@ int InsertSortedReceipt(Position_Receipt head_receipt, Position_Receipt new_rece
     if(head_receipt->next == NULL)
     {
         InsertAfterReceipt(head_receipt,new_receipt);
-        CreateArticaleList(new_receipt);
+        CreateArticleList(new_receipt);
         return EXIT_SUCCESS;
     }
 
@@ -157,13 +157,13 @@ int InsertSortedReceipt(Position_Receipt head_receipt, Position_Receipt new_rece
         if(current->next == NULL || CompareDates(current->next->date,new_receipt->date) == -1)
         {
             InsertAfterReceipt(current,new_receipt);
-            CreateArticaleList(new_receipt);
+            CreateArticleList(new_receipt);
             return EXIT_SUCCESS;
         }
 
         else
         {
-            CreateArticaleList(new_receipt);
+            CreateArticleList(new_receipt);
             MergeReceipts(current,new_receipt);
             DeleteReceipt(new_receipt);
         }
@@ -172,7 +172,7 @@ int InsertSortedReceipt(Position_Receipt head_receipt, Position_Receipt new_rece
     return EXIT_SUCCESS;
 }
 
-int CreateArticaleList(Position_Receipt new_receipt)
+int CreateArticleList(Position_Receipt new_receipt)
 {
     FILE* fp_receipt = fopen(new_receipt->file_receipt,"r");
 
@@ -183,12 +183,12 @@ int CreateArticaleList(Position_Receipt new_receipt)
     }
 
     char buffer[FILE_LINE];
-    char articale_name[NAME_SIZE];
+    char article_name[NAME_SIZE];
     int amount;
     float price;
     int check = 0;
 
-    memset(new_receipt->Head.articale_name,'\0',NAME_SIZE);
+    memset(new_receipt->Head.article_name,'\0',NAME_SIZE);
     new_receipt->Head.amount = 0;
     new_receipt->Head.price = 0.0;
 
@@ -197,7 +197,7 @@ int CreateArticaleList(Position_Receipt new_receipt)
     while(!feof(fp_receipt))
     {
         fgets(buffer,FILE_LINE,fp_receipt);
-        sscanf(buffer,"%s %d %f %n", articale_name, &amount, &price, &check);
+        sscanf(buffer,"%s %d %f %n", article_name, &amount, &price, &check);
 
         if(check == 0)
         {
@@ -205,9 +205,9 @@ int CreateArticaleList(Position_Receipt new_receipt)
             break;
         }
 
-        Position_Articale new_articale = CreateArticale(articale_name,amount,price);
+        Position_Article new_article = CreateArticle(article_name,amount,price);
 
-        if(new_articale != NULL) InsertSortedArticale(&(new_receipt->Head),new_articale);
+        if(new_article != NULL) InsertSortedArticle(&(new_receipt->Head),new_article);
         check = 0;
     }
 
@@ -216,66 +216,66 @@ int CreateArticaleList(Position_Receipt new_receipt)
     return EXIT_SUCCESS;
 }
 
-Position_Articale CreateArticale(char* articale_name, int amount, float price)
+Position_Article CreateArticle(char* article_name, int amount, float price)
 {
-    Position_Articale new_articale = (Position_Articale )malloc(sizeof(struct Articale));
+    Position_Article new_article = (Position_Article )malloc(sizeof(struct Article));
 
-    if(new_articale == NULL)
+    if(new_article == NULL)
     {
         perror("Could not allocate new articale!");
         return NULL;
     }
 
-    strcpy(new_articale->articale_name,articale_name);
-    new_articale->amount = amount;
-    new_articale->price = price;
+    strcpy(new_article->article_name,article_name);
+    new_article->amount = amount;
+    new_article->price = price;
 
-    return new_articale;
+    return new_article;
 }
 
-int InsertSortedArticale(Position_Articale head_articale, Position_Articale new_articale)
+int InsertSortedArticle(Position_Article head_article, Position_Article new_article)
 {
-    if(head_articale->next == NULL)
+    if(head_article->next == NULL)
     {
-        InsertAfterArticale(head_articale,new_articale);
+        InsertAfterArticle(head_article,new_article);
         return EXIT_SUCCESS;
     }
 
-    else if(head_articale->next != NULL && strcmp(head_articale->next->articale_name,new_articale->articale_name)<0)
+    else if(head_article->next != NULL && strcmp(head_article->next->article_name,new_article->article_name)<0)
     {
-        InsertAfterArticale(head_articale,new_articale);
+        InsertAfterArticle(head_article,new_article);
         return EXIT_SUCCESS;
     }
 
-    Position_Articale current = head_articale;
-    while(current->next != NULL && strcmp(current->next->articale_name,new_articale->articale_name)>0)
+    Position_Article current = head_article;
+    while(current->next != NULL && strcmp(current->next->article_name,new_article->article_name)>0)
     {
         current = current->next;
     }
 
-    if(current->next != NULL && strcmp(current->next->articale_name,new_articale->articale_name) != 0)
+    if(current->next != NULL && strcmp(current->next->article_name,new_article->article_name) != 0)
     {
-        InsertAfterArticale(current,new_articale);
+        InsertAfterArticle(current,new_article);
     }
 
     else if(current->next == NULL)
     {
-        InsertAfterArticale(current,new_articale);
+        InsertAfterArticle(current,new_article);
     }
 
     else
     {
-        current->next->amount += new_articale->amount;
-        free(new_articale);
+        current->next->amount += new_article->amount;
+        free(new_article);
     }
 
     return EXIT_SUCCESS;
 }
 
-int InsertAfterArticale(Position_Articale current, Position_Articale new_articale)
+int InsertAfterArticle(Position_Article current, Position_Article new_article)
 {
-    new_articale->next = current->next;
-    current->next = new_articale;
+    new_article->next = current->next;
+    current->next = new_article;
 
     return EXIT_SUCCESS;
 }
@@ -329,15 +329,15 @@ int CompareDates(char* first_date, char* second_date)
 
 int MergeReceipts(Position_Receipt current, Position_Receipt new_receipt)
 {
-    Position_Articale temp, dummy = &(new_receipt->Head);
+    Position_Article temp, dummy = &(new_receipt->Head);
 
     while(dummy->next != NULL)
     {
         if(!IsPresent(&(current->next->Head),dummy->next))
         {
-            temp = CreateArticale(dummy->next->articale_name,dummy->next->amount,dummy->next->price);
+            temp = CreateArticle(dummy->next->article_name,dummy->next->amount,dummy->next->price);
             
-            InsertSortedArticale(&(current->next->Head),temp);
+            InsertSortedArticle(&(current->next->Head),temp);
         }
 
         dummy = dummy->next;
@@ -346,16 +346,16 @@ int MergeReceipts(Position_Receipt current, Position_Receipt new_receipt)
     return EXIT_SUCCESS;
 }
 
-bool IsPresent(Position_Articale head_articale, Position_Articale articale)
+bool IsPresent(Position_Article head_article, Position_Article article)
 {
-    while(head_articale->next != NULL)
+    while(head_article->next != NULL)
     {
-        if(strcmp(head_articale->next->articale_name,articale->articale_name) == 0)
+        if(strcmp(head_article->next->article_name,article->article_name) == 0)
         {
             return true;
         }
 
-        head_articale = head_articale->next;
+        head_article = head_article->next;
     }
 
     return false;
@@ -371,7 +371,7 @@ int SearchItem(Position_Receipt head_receipt, char* item, char* first_date, char
         if(InTimePeriod(head_receipt->next->date,first_date,second_date))
         {
             if(amount == 0) price = FindPrice(&(head_receipt->next->Head),item);
-            amount += SearchInArticaleList(&(head_receipt->next->Head),item);
+            amount += SearchInArticleList(&(head_receipt->next->Head),item);
         }
 
         head_receipt = head_receipt->next;
@@ -384,37 +384,37 @@ int SearchItem(Position_Receipt head_receipt, char* item, char* first_date, char
     return EXIT_SUCCESS;
 }
 
-int SearchInArticaleList(Position_Articale head_articale, char* item)
+int SearchInArticleList(Position_Article head_article, char* item)
 {
     int count = 0;
     
-    while(head_articale->next != NULL)
+    while(head_article->next != NULL)
     {
-        if(strcmp(head_articale->next->articale_name,item) == 0)
+        if(strcmp(head_article->next->article_name,item) == 0)
         {
-            count = head_articale->next->amount;
+            count = head_article->next->amount;
             break;
         }
 
-        head_articale = head_articale->next;
+        head_article = head_article->next;
     }
 
     return count;
 }
 
-float FindPrice(Position_Articale head_articale, char* item)
+float FindPrice(Position_Article head_article, char* item)
 {
     float price = 0.0;
 
-    while(head_articale->next != NULL)
+    while(head_article->next != NULL)
     {
-        if(strcmp(head_articale->next->articale_name,item) == 0)
+        if(strcmp(head_article->next->article_name,item) == 0)
         {
-            price = head_articale->next->price;
+            price = head_article->next->price;
             break;
         }
 
-        head_articale = head_articale->next;
+        head_article = head_article->next;
     }
 
     return price;
@@ -435,14 +435,14 @@ int DeleteReceipt(Position_Receipt head_receipt)
     return EXIT_SUCCESS;
 }
 
-int DeleteArticaleList(Position_Articale head_articale)
+int DeleteArticaleList(Position_Article head_article)
 {
-    Position_Articale temp;
+    Position_Article temp;
 
-    while(head_articale->next != NULL)
+    while(head_article->next != NULL)
     {
-        temp = head_articale->next;
-        head_articale->next = head_articale->next->next;
+        temp = head_article->next;
+        head_article->next = head_article->next->next;
         free(temp);
     }
 
