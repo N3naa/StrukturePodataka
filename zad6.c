@@ -38,7 +38,6 @@ Position_Receipt CreateReceipt(char* file_name, char* date);
 Position_Article CreateArticle(char* article_name, int amount, float price);
 int CreateArticleList(Position_Receipt new_receipt);
 int MergeReceipts(Position_Receipt current, Position_Receipt new_receipt);
-bool IsPresent(Position_Article head_article, Position_Article article);
 int SearchInArticleList(Position_Article head_article, char* item);
 float FindPrice(Position_Article head_article, char* item);
 int SearchItem(Position_Receipt head_receipt, char* item,char* first_date, char* second_date);
@@ -333,32 +332,14 @@ int MergeReceipts(Position_Receipt current, Position_Receipt new_receipt)
 
     while(dummy->next != NULL)
     {
-        if(!IsPresent(&(current->next->Head),dummy->next))
-        {
-            temp = CreateArticle(dummy->next->article_name,dummy->next->amount,dummy->next->price);
-            
-            InsertSortedArticle(&(current->next->Head),temp);
-        }
+        temp = CreateArticle(dummy->next->article_name,dummy->next->amount,dummy->next->price);
+
+        InsertSortedArticle(&(current->next->Head),temp);
 
         dummy = dummy->next;
     }
 
     return EXIT_SUCCESS;
-}
-
-bool IsPresent(Position_Article head_article, Position_Article article)
-{
-    while(head_article->next != NULL)
-    {
-        if(strcmp(head_article->next->article_name,article->article_name) == 0)
-        {
-            return true;
-        }
-
-        head_article = head_article->next;
-    }
-
-    return false;
 }
 
 int SearchItem(Position_Receipt head_receipt, char* item, char* first_date, char* second_date)
@@ -468,7 +449,7 @@ bool InTimePeriod(char* receipt_date, char* first_date, char* second_date)
 
         else
         {
-            if(receipt_month >= first_month && receipt_month <= second_month )
+            if(receipt_month >= first_month && receipt_month <= second_month)
             {
                 if(first_day == 0 && second_day == 0)
                 {
