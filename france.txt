@@ -1,0 +1,7 @@
+Bordeaux 243626
+Marseille 855393
+LeMans 144244
+Nice 342295
+Lyon 500715
+Paris 2229621
+Toulouse 458298

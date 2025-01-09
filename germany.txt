@@ -1,0 +1,8 @@
+Berlin 3677472
+Leipzig 601866
+Potsdam 167745
+Hamburg 1906411
+Stuttgart 623738
+Aachen 249070
+Munich 1450381
+Frankfurt 732688

@@ -1,0 +1,7 @@
+Leicester 	887000
+Liverpool   1365900
+Newcastle   1055600
+London      12208100
+Leeds       1499465
+Manchester  2732854
+Birgimham   2284093

@@ -1,0 +1,9 @@
+Novi-Sad 280763
+Cacak 69598
+Leskovac 54091
+Zemun 155591
+Belgrade 1197714
+Subotica 88752
+Kragujevac 146315
+Nis 182797
+Novi-Pazar 85996

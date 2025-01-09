@@ -1,0 +1,9 @@
+Trogir 12393
+Dubrovnik 41562
+Sibenik 42599
+Varazdin 43782
+Rijeka 107964
+Zagreb 767131
+Osijek 75535
+Zadar 70779
+Split 160577
