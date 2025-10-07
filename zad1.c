@@ -36,6 +36,11 @@ int main()
 
     ps = (_student *)malloc(n*sizeof(_student));
 
+    if (!ps) {
+        perror("Memory allocation failed");
+        return EXIT_FAILURE;
+    }
+
     fill_array(ps,n,filename);
 
     puts("List of students and their scores: \n");
